@@ -74,7 +74,7 @@ if(isset($_GET['q'])){
     <?php
 
     if(isset($q) || !trim($q)===''){
-        if($query_res['hits']['total'] >= 1) {
+        if(isset($query_res) && $query_res['hits']['total'] >= 1) {
             echo '<div>', 'Trovati ', $query_res['hits']['total'], ' risultati in ', $query_res['took'], ' ms.', '</div>';
         }
         else {
@@ -88,7 +88,7 @@ if(isset($_GET['q'])){
             ?>
             <div class="result">
                 <div class="result-title">
-                    <a href="<?php echo str_replace('/home/pierluigi','http://localhost:80',$r['_source']['path']); ?>" target="_blank"><?php echo $r['_source']['title']; ?></a>
+                    <a href="<?php echo $r['_source']['path']; ?>" target="_blank"><?php echo $r['_source']['title']; ?></a>
                 </div>
                 <div class="result-text">
                     <?php $posizione = stripos($r['_source']['body'], $q);
@@ -120,7 +120,7 @@ if(isset($_GET['q'])){
 
             for ($i = 1; $i <= $numPag; $i++){
 
-                echo '<a href="index.php?q=', $q, '&page=', $i,'">', $i, '/</a>';
+                echo '<a href="index.php?q=', $q, '&page=', $i,'">', $i, '</a>  ';
 
             }
         }
