@@ -23,7 +23,13 @@ if(isset($_GET['q'])){
         ]
     ];
     $params['size'] = 10;
-    $params['from'] = 0; // <-- will return second page
+    if(isset($_GET['page'])){
+        $page = $_GET['page'];
+
+        $params['from'] = (($page-1)*(10)); // <-- will return second page
+        #echo $params['from'];
+
+    }
     $query_res = $client->search($params);
     #echo '<pre>', print_r($query), '</pre>';
 
@@ -69,10 +75,10 @@ if(isset($_GET['q'])){
 
     if(isset($q) || !trim($q)===''){
         if($query_res['hits']['total'] >= 1) {
-            echo '<div>', '<b>Trovati ', $query_res['hits']['total'], ' risultati in ', $query_res['took'], ' ms.</b>', '</div>';
+            echo '<div>', 'Trovati ', $query_res['hits']['total'], ' risultati in ', $query_res['took'], ' ms.', '</div>';
         }
         else {
-            echo '<div>', '<b>Nessun risultato trovato</b>', '</div>';
+            echo '<div>', 'Nessun risultato trovato', '</div>';
         }
     }
     ?>
@@ -82,7 +88,7 @@ if(isset($_GET['q'])){
             ?>
             <div class="result">
                 <div class="result-title">
-                    <a href="<?php echo str_replace('/home/alessandro','http://localhost:80',$r['_source']['path']); ?>" target="_blank"><?php echo $r['_source']['title']; ?></a>
+                    <a href="<?php echo str_replace('/home/pierluigi','http://localhost:80',$r['_source']['path']); ?>" target="_blank"><?php echo $r['_source']['title']; ?></a>
                 </div>
                 <div class="result-text">
                     <?php $posizione = stripos($r['_source']['body'], $q);
@@ -106,6 +112,18 @@ if(isset($_GET['q'])){
     <div class="pages" >
         <?php
 
+        if(isset($query_res) && $query_res['hits']['total'] >= 1){
+
+            $numPag = floor($query_res['hits']['total'] / 10);
+            if($query_res['hits']['total']%10 > 0)
+                $numPag++;
+
+            for ($i = 1; $i <= $numPag; $i++){
+
+                echo '<a href="index.php?q=', $q, '&page=', $i,'">', $i, '/</a>';
+
+            }
+        }
         ?>
     </div>
 </div>
