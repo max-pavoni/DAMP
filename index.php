@@ -12,11 +12,64 @@ if(isset($_GET['q'])){
         'index' => 'people',
         'type' => 'page',
         'body' => [
-            'query' => [
-                'bool' => [
-                    'must' => [
-                        #[ 'match' => [ 'title' => $q ] ],
-                        [ 'match' => [ 'body' => $q ] ]
+            'query'=> [
+                'bool'=> [
+                    'should'=> [
+                        [
+                            'match'=> [
+                                'title'=> [
+                                    'query'=> $q,
+                                    'boost'=> 1.5
+                                ]
+                            ]
+                        ],
+                        [
+                            'match'=> [
+                                'body'=> [
+                                    'query' => $q,
+                                ]
+                            ]
+                        ],
+                        [
+                            'match'=> [
+                                'body'=> [
+                                    'query' => $q,
+                                    'fuzziness' => 'AUTO',
+                                    'boost' => 0.5
+                                ]
+                            ]
+                        ],
+                        [
+                            'match_phrase'=> [
+                                'title'=> [
+                                    'query'=> $q,
+                                    'boost' => 3,
+                                    'slop' => 3
+                                ]
+                            ]
+                        ],
+                        [
+                            'match_phrase'=> [
+                                'body'=> [
+                                    'query'=> $q,
+                                    'boost' => 2,
+                                    'slop' => 3
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            'highlight' => [
+                'order'=> 'score',
+                'pre_tags' => ['<b>'],
+                'post_tags' => ['</b>'],
+                'fields' => [
+                    'body' => [
+                        'type' => 'plain',
+                        'fragment_size' => 150,
+                        'number_of_fragments' => 3
+
                     ]
                 ]
             ]
@@ -60,7 +113,7 @@ if(isset($_GET['q'])){
     <div class="search-bar" align="middle">
         <form action="index.php" method="get" autocomplete="off">
             <p> <label>
-                    <input type="text" name="q" placeholder="Cerca qualcosa...">
+                    <input type="text" name="q" value="<?php if(isset($q)) echo $q; ?>" placeholder="Cerca qualcosa...">
                 </label>
             </p>
             <div>
@@ -91,13 +144,10 @@ if(isset($_GET['q'])){
                     <a href="<?php echo $r['_source']['path']; ?>" target="_blank"><?php echo $r['_source']['title']; ?></a>
                 </div>
                 <div class="result-text">
-                    <?php $posizione = stripos($r['_source']['body'], $q);
-                    if($posizione > 150)
-                        echo "...".preg_replace("/".$q."/i", "<b>\$0</b>", substr($r['_source']['body'], $posizione -150, 300))."...";
-
-                    else
-                        echo "...".preg_replace("/".$q."/i", "<b>\$0</b>", substr($r['_source']['body'], 0, 300))."...";
-
+                    <?php
+                    foreach ($r['highlight']['body'] as $fragment){
+                        echo $fragment, ' ... ';
+                    }
                     ?>
                 </div>
                 <div class="result-link">
