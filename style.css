@@ -82,6 +82,14 @@ textarea:hover, textarea:focus {
     color: #00af4e;
 }
 
+#input-container {
+     position:absolute;
+    width: 50px;
+ }
+
+#ui-id-1 {
+    width: 40px;
+}
 
 body{
     background: #FAFAFA;

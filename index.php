@@ -5,7 +5,11 @@
  * Date: 04/04/16
  * Time: 15.31
  */
-require_once 'app/init.php';
+require_once 'init.php';
+
+
+
+
 if(isset($_GET['q'])){
     $q = trim($_GET['q']);
     $params = [
@@ -13,6 +17,7 @@ if(isset($_GET['q'])){
         'type' => 'page',
         'body' => [
             'query'=> [
+               
                 'bool'=> [
                     'should'=> [
                         [
@@ -103,21 +108,25 @@ if(isset($_GET['q'])){
     <meta charset="utf-8">
     <title>DAMP</title>
     <link rel="stylesheet" type="text/css" href="style.css">
-
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+    <script src="js/prediction.js"></script>
+    <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
 </head>
 <body>
 <div class="logo-bar-container">
     <div class="logo" align="middle">
         <a href="index.php"><img src="res/logo.png" align="middle" width="320"></a>
     </div>
-    <div class="search-bar" align="middle">
+    <divclass="search-bar" align="middle">
         <form action="index.php" method="get" autocomplete="off">
             <p> <label>
-                    <input type="text" name="q" value="<?php if(isset($q)) echo $q; ?>" placeholder="Cerca qualcosa...">
+                    <input type="text" name="q" id="search" value="<?php if(isset($q)) echo $q; ?>" placeholder="Cerca qualcosa...">
                 </label>
             </p>
             <div>
                 <input type="submit" value="Cerca">
+                <div  id="#input-container"></div>
             </div>
         </form>
     </div>
@@ -141,7 +150,7 @@ if(isset($_GET['q'])){
             ?>
             <div class="result">
                 <div class="result-title">
-                    <a href="<?php echo $r['_source']['path']; ?>" target="_blank"><?php echo $r['_source']['title']; ?></a>
+                    <a href="http://<?php echo $r['_source']['path']; ?>"><?php echo $r['_source']['title']; ?></a>
                 </div>
                 <div class="result-text">
                     <?php
