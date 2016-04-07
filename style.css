@@ -48,6 +48,7 @@ textarea:hover, textarea:focus {
 }
 
 .results-container{
+    float: left;
     padding-bottom: 40px;
     padding-top: 20px;
     padding-left: 20px;

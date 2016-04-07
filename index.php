@@ -81,6 +81,7 @@ if(isset($_GET['q'])){
         ]
     ];
     $params['size'] = 10;
+
     if(isset($_GET['page'])){
         $page = $_GET['page'];
 
@@ -91,16 +92,36 @@ if(isset($_GET['q'])){
     $query_res = $client->search($params);
     #echo '<pre>', print_r($query), '</pre>';
 
-
+$output = null;
     if($query_res['hits']['total'] >= 1){
         $output = $query_res['hits']['hits'];
 
     }
 
+
+    $people = array();
+
+
+    if(!isset($_GET['page']) || $_GET['page'] > 1) {
+        foreach ($output as $r) {
+
+            preg_match('/people\/[\s\S]+\//', $r['_source']['path'], $matches);
+
+            preg_match('/\/[\s\S]+\//', $matches[0], $nome);
+            $nome[0] = str_replace('/', "", $nome[0]);
+            //echo $nome[0] . "\n\n";
+            if (!isset($people[$nome[0]]))
+                $people[$nome[0]] = 1;
+            else
+                $people[$nome[0]] = $people[$nome[0]] + 1;
+
+        }
+        ksort($people);
+    }
 }
 
-
 ?>
+
 
 <!doctype html>
 <html>
@@ -119,7 +140,7 @@ if(isset($_GET['q'])){
         <a href="index.php"><img src="res/logo.png" align="middle" width="320"></a>
     </div>
     <divclass="search-bar" align="middle">
-        <form action="index.php" method="get" autocomplete="off">
+        <form id="search-form" action="index.php" method="get" autocomplete="off">
             <p> <label>
                     <input type="text" name="q" id="search" value="<?php if(isset($q)) echo $q; ?>" placeholder="Cerca qualcosa...">
                 </label>
@@ -185,6 +206,17 @@ if(isset($_GET['q'])){
         }
         ?>
     </div>
+</div>
+<?php if($_GET['page'] == 1 || $_GET['page'] == null && $_GET['q'] != null)  {?>
+<div style="float:right; margin-right: 200px; margin-top: 50px;">
+    Stavi forse cercando...
+    <hr>
+        <?php foreach ($people as $person => $value)
+
+        echo '<div style="margin-top: 10px;">'. '<a href="index.php?q='. $person .'">'.$person.'</a></div>'
+        ?>
+<?php }
+    ?>
 </div>
 </body>
 </html>

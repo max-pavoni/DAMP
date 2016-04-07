@@ -7,9 +7,9 @@
  */
 require_once '../init.php';
 
-if(isset($_POST['q'])) {
+if(isset($_GET['q'])) {
 
-    $q = $_POST['q'];
+    $q = $_GET['q'];
 
     $params = [
         'index' => 'people',
