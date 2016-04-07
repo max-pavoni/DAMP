@@ -132,6 +132,7 @@ $output = null;
     <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
 </head>
 <body>
+
 <div class="logo-bar-container">
     <div class="logo" align="middle">
         <a href="index.php"><img src="res/logo.png" align="middle" width="320"></a>
@@ -142,11 +143,28 @@ $output = null;
                     <input type="text" name="q" id="search" value="<?php if(isset($q)) echo $q; ?>" placeholder="Cerca qualcosa...">
                 </label>
             </p>
+
             <div>
                 <input type="submit" value="Cerca">
                 <div  id="#input-container"></div>
             </div>
         </form>
+        <?php if(isset($query_res) && $query_res['hits']['total'] >= 1 && ($_GET['page'] == 1 || $_GET['page'] == null && $_GET['q'] != null))  {?>
+            <div class="panel panel-default" style="display: inline-block; float: right; margin: 0px 150px; width: 300px;" >
+                <div class="panel-body">
+                    <div>
+                        <p><b>Stavi forse cercando...</b></p>
+                        <hr>
+
+                        <?php foreach ($people as $person => $value)
+                            echo '<div style="margin-top: 10px;">'. '<a href="index.php?q='. $person .'">'.$person.'</a></div>'
+                        ?>
+                    </div>
+
+                </div>
+            </div>
+        <?php }
+        ?>
     </div>
 </div>
 
@@ -190,23 +208,6 @@ $output = null;
     </div>
 
 
-            <?php if(isset($query_res) && $query_res['hits']['total'] >= 1 && ($_GET['page'] == 1 || $_GET['page'] == null && $_GET['q'] != null))  {?>
-    <div class="panel panel-default" style="display: inline-block; float: right; margin: 0px 150px; width: 300px;" >
-        <div class="panel-body">
-                <div>
-                    <p><b>Stavi forse cercando...</b></p>
-                    <hr>
-
-                    <?php foreach ($people as $person => $value)
-
-                        echo '<div style="margin-top: 10px;">'. '<a href="index.php?q='. $person .'">'.$person.'</a></div>'
-                    ?>
-                </div>
-
-        </div>
-    </div>
-            <?php }
-            ?>
 
 
 
@@ -216,7 +217,7 @@ $output = null;
 
     ?>
     <div class="pages" style="width: 50%;">
-<?php 
+<?php
     $numPag = floor($query_res['hits']['total'] / 10);
     if ($query_res['hits']['total'] % 10 > 0)
         $numPag++;
@@ -234,17 +235,17 @@ $output = null;
 
             <?php
             for ($i = 1; $i <= $numPag; $i++)
-                echo '<li><a href="index.php?q=', $q, '&page=', $i, '">', $i, '</a></li> ';
-
+                    echo '<li><a href="index.php?q=', $q, '&page=', $i, '">', $i, '</a></li> ';
             }?>
+           <?php if(isset($output)): ?>
             <li>
                 <a href="#" aria-label="Next">
                     <span aria-hidden="true">&raquo;</span>
                 </a>
             </li>
+           <?php endif; ?>
         </ul>
     </nav>
-
 
 
 
