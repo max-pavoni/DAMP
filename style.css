@@ -48,18 +48,18 @@ textarea:hover, textarea:focus {
 }
 
 .results-container{
-    float: left;
     padding-bottom: 40px;
     padding-top: 20px;
     padding-left: 20px;
     text-align: left;
-    width: 50%;
+    width: 100%;
 }
 
 .result{
     padding: 5px;
     padding-top: 15px;
     padding-bottom: 15px;
+    float: left;
 }
 
 .result:hover{
@@ -83,16 +83,16 @@ textarea:hover, textarea:focus {
     color: #00af4e;
 }
 
-#input-container {
-     position:absolute;
-    width: 50px;
- }
 
-#ui-id-1 {
-    width: 40px;
-}
 
 body{
     background: #FAFAFA;
     font: 14px/100% Verdana, sans-serif;
+}
+
+
+.active {
+    background-color: #4CAF50;
+    width: 80px;
+    margin-left: -40px;
 }

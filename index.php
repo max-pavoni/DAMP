@@ -17,9 +17,27 @@ if(isset($_GET['q'])){
         'type' => 'page',
         'body' => [
             'query'=> [
-               
+
                 'bool'=> [
                     'should'=> [
+                        [
+                            'match'=> [
+                                'title'=> [
+                                    'query'=> $q,
+                                    'boost' => 0.3,
+                                    'cutoff_frequency' => 0.001
+                                ]
+                            ]
+                        ],
+                        [
+                            'match'=> [
+                                'body'=> [
+                                    'query'=> $q,
+                                    'boost' => 0.2,
+                                    'cutoff_frequency' => 0.001
+                                ]
+                            ]
+                        ],
                         [
                             'match_phrase'=> [
                                 'title'=> [
@@ -85,7 +103,8 @@ $output = null;
 
             preg_match('/\/[\s\S]+\//', $matches[0], $nome);
             $nome[0] = str_replace('/', "", $nome[0]);
-            //echo $nome[0] . "\n\n";
+            $nome[0] = ucwords(strtolower($nome[0]));
+
             if (!isset($people[$nome[0]]))
                 $people[$nome[0]] = 1;
             else
@@ -106,6 +125,8 @@ $output = null;
     <title>DAMP</title>
     <link rel="stylesheet" type="text/css" href="style.css">
     <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
     <script src="js/prediction.js"></script>
     <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
@@ -115,7 +136,7 @@ $output = null;
     <div class="logo" align="middle">
         <a href="index.php"><img src="res/logo.png" align="middle" width="320"></a>
     </div>
-    <divclass="search-bar" align="middle">
+    <div class="search-bar" align="middle">
         <form id="search-form" action="index.php" method="get" autocomplete="off">
             <p> <label>
                     <input type="text" name="q" id="search" value="<?php if(isset($q)) echo $q; ?>" placeholder="Cerca qualcosa...">
@@ -141,6 +162,8 @@ $output = null;
         }
     }
     ?>
+
+    <div id="results" style="display: inline-block; width: 50%">
     <?php
     if(isset($output)){
         foreach ($output as $r){
@@ -164,35 +187,71 @@ $output = null;
         }
     }
     ?>
-
-    <div class="pages" >
-        <?php
-
-        if(isset($query_res) && $query_res['hits']['total'] >= 1){
-
-            $numPag = floor($query_res['hits']['total'] / 10);
-            if($query_res['hits']['total']%10 > 0)
-                $numPag++;
-
-            for ($i = 1; $i <= $numPag; $i++){
-
-                echo '<a href="index.php?q=', $q, '&page=', $i,'">', $i, '</a>  ';
-
-            }
-        }
-        ?>
     </div>
-</div>
-<?php if($_GET['page'] == 1 || $_GET['page'] == null && $_GET['q'] != null)  {?>
-<div style="float:right; margin-right: 200px; margin-top: 50px;">
-    Stavi forse cercando...
-    <hr>
-        <?php foreach ($people as $person => $value)
 
-        echo '<div style="margin-top: 10px;">'. '<a href="index.php?q='. $person .'">'.$person.'</a></div>'
-        ?>
-<?php }
+
+            <?php if(isset($query_res) && $query_res['hits']['total'] >= 1 && ($_GET['page'] == 1 || $_GET['page'] == null && $_GET['q'] != null))  {?>
+    <div class="panel panel-default" style="display: inline-block; float: right; margin: 0px 150px; width: 300px;" >
+        <div class="panel-body">
+                <div>
+                    <p><b>Stavi forse cercando...</b></p>
+                    <hr>
+
+                    <?php foreach ($people as $person => $value)
+
+                        echo '<div style="margin-top: 10px;">'. '<a href="index.php?q='. $person .'">'.$person.'</a></div>'
+                    ?>
+                </div>
+
+        </div>
+    </div>
+            <?php }
+            ?>
+
+
+
+    <?php
+
+    if(isset($query_res) && $query_res['hits']['total'] >= 1){
+
     ?>
+    <div class="pages" style="width: 50%;">
+<?php 
+    $numPag = floor($query_res['hits']['total'] / 10);
+    if ($query_res['hits']['total'] % 10 > 0)
+        $numPag++;
+    /*echo '<ul>';
+    echo '<li style="float:left"><a class="active">PAGE</a>';*/
+    ?>
+
+    <nav>
+        <ul class="pagination">
+            <li>
+                <a href="#" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+
+            <?php
+            for ($i = 1; $i <= $numPag; $i++)
+                echo '<li><a href="index.php?q=', $q, '&page=', $i, '">', $i, '</a></li> ';
+
+            }?>
+            <li>
+                <a href="#" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+
+
+
 </div>
+
+</div>
+
+
 </body>
 </html>
