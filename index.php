@@ -21,35 +21,11 @@ if(isset($_GET['q'])){
                 'bool'=> [
                     'should'=> [
                         [
-                            'match'=> [
-                                'title'=> [
-                                    'query'=> $q,
-                                    'boost'=> 1.5
-                                ]
-                            ]
-                        ],
-                        [
-                            'match'=> [
-                                'body'=> [
-                                    'query' => $q,
-                                ]
-                            ]
-                        ],
-                        [
-                            'match'=> [
-                                'body'=> [
-                                    'query' => $q,
-                                    'fuzziness' => 'AUTO',
-                                    'boost' => 0.5
-                                ]
-                            ]
-                        ],
-                        [
                             'match_phrase'=> [
                                 'title'=> [
                                     'query'=> $q,
                                     'boost' => 3,
-                                    'slop' => 3
+                                    'slop' => 30
                                 ]
                             ]
                         ],
@@ -58,7 +34,7 @@ if(isset($_GET['q'])){
                                 'body'=> [
                                     'query'=> $q,
                                     'boost' => 2,
-                                    'slop' => 3
+                                    'slop' => 30
                                 ]
                             ]
                         ]
