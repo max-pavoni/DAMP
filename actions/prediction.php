@@ -33,7 +33,7 @@ if(isset($_GET['q'])) {
         // Replaces all spaces with hyphens.
         $string = str_replace('\t', '', $string);
 
-        $string = preg_replace('/[^A-Za-z0-9\s]/', '', $string);
+        $string = preg_replace('/[^A-Za-z0-9\s\à\è\é\ì\ò\ù]/', '', $string);
 
         return preg_replace('/[\s]+/', ' ', $string);
     }

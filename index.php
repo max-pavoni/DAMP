@@ -25,7 +25,8 @@ if(isset($_GET['q'])){
                                 'title'=> [
                                     'query'=> $q,
                                     'boost' => 0.3,
-                                    'cutoff_frequency' => 0.001
+                                    'cutoff_frequency' => 0.001,
+                                    'fuzziness' => 1
                                 ]
                             ]
                         ],
@@ -34,7 +35,8 @@ if(isset($_GET['q'])){
                                 'body'=> [
                                     'query'=> $q,
                                     'boost' => 0.2,
-                                    'cutoff_frequency' => 0.001
+                                    'cutoff_frequency' => 0.001,
+                                    'fuzziness' => 1
                                 ]
                             ]
                         ],
@@ -153,7 +155,7 @@ $output = null;
             <div class="panel panel-default" style="display: inline-block; float: right; margin: 0px 150px; width: 300px;" >
                 <div class="panel-body">
                     <div>
-                        <p><b>Stavi forse cercando...</b></p>
+                        <p><b>Ricerche correlate:</b></p>
                         <hr>
 
                         <?php foreach ($people as $person => $value)
@@ -211,45 +213,27 @@ $output = null;
 
 
 
+    <div class="pages"></div>
     <?php
 
     if(isset($query_res) && $query_res['hits']['total'] >= 1){
 
+        $numPag = floor($query_res['hits']['total'] / 10);
+        if($query_res['hits']['total']%10 > 0)
+            $numPag++;
+        echo '<ul class="pagination-ul">';
+        echo '<li class="pagination-li" style="float:left"><a class="active">PAGE</a>';
+
+        for ($i = 1; $i <= $numPag; $i++){
+            echo '<li class="pagination-li" ><a href="index.php?q=', $q, '&page=', $i,'">', $i, '</a></li> ';
+
+        }
+        echo '</ul>';
+    }
     ?>
-    <div class="pages" style="width: 50%;">
-<?php
-    $numPag = floor($query_res['hits']['total'] / 10);
-    if ($query_res['hits']['total'] % 10 > 0)
-        $numPag++;
-    /*echo '<ul>';
-    echo '<li style="float:left"><a class="active">PAGE</a>';*/
-    ?>
-
-    <nav>
-        <ul class="pagination">
-            <li>
-                <a href="#" aria-label="Previous">
-                    <span aria-hidden="true">&laquo;</span>
-                </a>
-            </li>
-
-            <?php
-            for ($i = 1; $i <= $numPag; $i++)
-                    echo '<li><a href="index.php?q=', $q, '&page=', $i, '">', $i, '</a></li> ';
-            }?>
-           <?php if(isset($output)): ?>
-            <li>
-                <a href="#" aria-label="Next">
-                    <span aria-hidden="true">&raquo;</span>
-                </a>
-            </li>
-           <?php endif; ?>
-        </ul>
-    </nav>
 
 
 
-</div>
 
 </div>
 
