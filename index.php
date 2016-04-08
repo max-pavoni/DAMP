@@ -138,13 +138,17 @@ $output = null;
 <div class="logo-bar-container">
     <div class="logo" align="middle">
         <a href="index.php"><img src="res/logo.png" align="middle" width="320"></a>
+        <br><br>
     </div>
     <div class="search-bar" align="middle">
+        <div id="info">
+            <p id="info_start"> Premi sul microfono per avviare una ricerca vocale. </p>
+            <p id="info_speak_now">Parla ora</p>
+        </div>
         <form id="search-form" action="index.php" method="get" autocomplete="off">
-            <p> <label>
+
                     <input type="text" name="q" id="search" value="<?php if(isset($q)) echo $q; ?>" placeholder="Cerca qualcosa...">
-                </label>
-            </p>
+                    <img onclick="startButton()" id="start_img" src="res/mic.gif" alt="Start" />
 
             <div>
                 <input type="submit" value="Cerca">
@@ -237,6 +241,72 @@ $output = null;
 
 </div>
 
+<script>
 
+    showInfo('info_start');
+
+    var final_transcript = '';
+    var recognizing = false;
+
+
+    if (!('webkitSpeechRecognition' in window)) {
+        //Speech API not supported here…
+    } else { //Let’s do some cool stuff :)
+        var recognition = new webkitSpeechRecognition(); //That is the object that will manage our whole recognition process.
+        recognition.continuous = false;   //Suitable for dictation.
+        recognition.interimResults = false;  //If we want to start receiving results even if they are not final.
+        //Define some more additional parameters for the recognition:
+        recognition.lang = "it_IT";
+        recognition.maxAlternatives = 1; //Since from our experience, the highest result is really the best...
+    }
+
+    recognition.onstart = function() {
+        //Listening (capturing voice from audio input) started.
+        //This is a good place to give the user visual feedback about that (i.e. flash a red light, etc.)
+        recognizing = true;
+        showInfo('info_speak_now');
+        start_img.src = 'res/mic-animate.gif';
+    };
+
+    recognition.onend = function() {
+        //Again – give the user feedback that you are not listening anymore. If you wish to achieve continuous recognition – you can write a script to start the recognizer again here.
+        recognizing = false;
+        start_img.src = 'res/mic.gif';
+        showInfo('info_start');
+
+    };
+
+    recognition.onresult = function(e) {
+        document.getElementById('search').value
+            = e.results[0][0].transcript;
+        recognition.stop();
+        document.getElementById('search-form').submit();
+    };
+
+    function startButton(event) {
+        if(recognizing) {
+            recognition.stop();
+        }
+        else{
+            recognition.start();
+        }
+        //start_img.src = 'res/mic-animate.gif'; //We change the image to a slashed until the user approves the browser to listen and recognition actually starts. Then – we’ll change the image to ‘mic on’.
+    }
+
+    function showInfo(s) {
+        if (s) {
+            for (var child = info.firstChild; child; child = child.nextSibling) {
+                if (child.style) {
+                    child.style.display = child.id == s ? 'inline' : 'none';
+                }
+            }
+            info.style.visibility = 'visible';
+        } else {
+            info.style.visibility = 'hidden';
+        }
+    }
+
+
+</script>
 </body>
 </html>

@@ -134,3 +134,23 @@ li {
 li:last-child {
     border-right: none;
 }
+
+/*   VOICE   */
+
+.info {
+    font-size: 12px;
+    text-align: center;
+    color: #777;
+    display: none;
+}
+#info {
+    font-size: 12px;
+    text-align: center;
+    color: #777;
+    visibility: hidden;
+}
+#start_img {
+    border: 0;
+    background-color:transparent;
+    padding: 0;
+}
