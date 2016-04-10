@@ -14,14 +14,24 @@ if(isset($_GET['q'])) {
     $params = [
         'index' => 'people',
         'body' => [
-
-            'page' => [
-                'text' => $q,
-
-                'completion' => [
-                    'field' => 'name_suggest',
-                    'fuzzy' => [
-                        'fuzziness' => 2
+            'size'=> 0,
+            'aggs'=> [
+                'autocomplete'=> [
+                    'terms'=> [
+                        'field'=> 'autocomplete',
+                        'order'=> [
+                            '_count'=> 'desc'
+                        ],
+                        'include'=> [
+                            'pattern'=> $q . '.*'
+                        ]
+                    ]
+                ]
+            ],
+            'query'=> [
+                'prefix'=> [
+                    'autocomplete'=> [
+                        'value'=> $q
                     ]
                 ]
             ]
@@ -38,13 +48,13 @@ if(isset($_GET['q'])) {
         return preg_replace('/[\s]+/', ' ', $string);
     }
 
-    $results = $client->suggest($params);
+    $results = $client->search($params);
 
     $opzioni = array();
-    foreach($results['page'][0]['options'] as $option) {
+    foreach($results['aggregations']['autocomplete']['buckets'] as $option) {
 
 
-        array_push($opzioni, clean($option['text']));
+        array_push($opzioni, clean($option['key']));
 
 
     }

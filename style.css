@@ -89,7 +89,7 @@ body{
     background: #FAFAFA;
     font: 14px/100% Verdana, sans-serif;
 }
-
+/*
 
 
 
@@ -109,7 +109,7 @@ body{
 .pagination-li {
     display: inline-block;
 
-    /* if you need ie7 support */
+    !* if you need ie7 support *!
     *display: inline;
     zoom: 1
 }
@@ -122,7 +122,7 @@ li a {
     text-decoration: none;
     font-weight: bold;
 }
-/* Change the link color to #111 (black) on hover */
+!* Change the link color to #111 (black) on hover *!
 li a:hover {
     background-color: #565;
 }

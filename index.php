@@ -16,17 +16,22 @@ if(isset($_GET['q'])){
         'index' => 'people',
         'type' => 'page',
         'body' => [
+            'suggest'=> [
+                'didYouMean'=> [
+                    'text'=> $q,
+                    'phrase'=> [
+                        'field'=> 'did_you_mean'
+                    ]
+                ]
+            ],
             'query'=> [
-
                 'bool'=> [
                     'should'=> [
                         [
                             'match'=> [
                                 'title'=> [
                                     'query'=> $q,
-                                    'boost' => 0.3,
-                                    'cutoff_frequency' => 0.001,
-                                    'fuzziness' => 1
+                                    'boost' => 0.3
                                 ]
                             ]
                         ],
@@ -34,9 +39,7 @@ if(isset($_GET['q'])){
                             'match'=> [
                                 'body'=> [
                                     'query'=> $q,
-                                    'boost' => 0.2,
-                                    'cutoff_frequency' => 0.001,
-                                    'fuzziness' => 1
+                                    'boost' => 0.2
                                 ]
                             ]
                         ],
@@ -60,6 +63,7 @@ if(isset($_GET['q'])){
                         ]
                     ]
                 ]
+
             ],
             'highlight' => [
                 'order'=> 'score',
@@ -88,7 +92,7 @@ if(isset($_GET['q'])){
     $query_res = $client->search($params);
     #echo '<pre>', print_r($query), '</pre>';
 
-$output = null;
+    $output = null;
     if($query_res['hits']['total'] >= 1){
         $output = $query_res['hits']['hits'];
 
@@ -147,8 +151,8 @@ $output = null;
         </div>
         <form id="search-form" action="index.php" method="get" autocomplete="off">
 
-                    <input type="text" name="q" id="search" value="<?php if(isset($q)) echo $q; ?>" placeholder="Cerca qualcosa...">
-                    <img onclick="startButton()" id="start_img" src="res/mic.gif" alt="Start" />
+            <input type="text" name="q" id="search" value="<?php if(isset($q)) echo $q; ?>" placeholder="Cerca qualcosa...">
+            <img onclick="startButton()" id="start_img" src="res/mic.gif" alt="Start" />
 
             <div>
                 <input type="submit" value="Cerca">
@@ -178,63 +182,101 @@ $output = null;
     <?php
 
     if(isset($q) || !trim($q)===''){
+
         if(isset($query_res) && $query_res['hits']['total'] >= 1) {
             echo '<div>', 'Trovati ', $query_res['hits']['total'], ' risultati in ', $query_res['took'], ' ms.', '</div>';
         }
         else {
             echo '<div>', 'Nessun risultato trovato', '</div>';
         }
+        if(!empty($query_res['suggest']['didYouMean'][0]['options'][0]['text'])){
+            echo '<div>', 'Forse cercavi: ', '<a href="index.php?q=',trim($query_res['suggest']['didYouMean'][0]['options'][0]['text']) ,'">',$query_res['suggest']['didYouMean'][0]['options'][0]['text'], '</a>', ' ?</div>';
+        }
+
     }
     ?>
 
     <div id="results" style="display: inline-block; width: 50%">
-    <?php
-    if(isset($output)){
-        foreach ($output as $r){
-            ?>
-            <div class="result">
-                <div class="result-title">
-                    <a href="http://<?php echo $r['_source']['path']; ?>"><?php echo $r['_source']['title']; ?></a>
+        <?php
+        if(isset($output)){
+            foreach ($output as $r){
+                ?>
+                <div class="result">
+                    <div class="result-title">
+                        <a href="http://<?php echo $r['_source']['path']; ?>"><?php echo $r['_source']['title']; ?></a>
+                    </div>
+                    <div class="result-text">
+                        <?php
+                        foreach ($r['highlight']['body'] as $fragment){
+                            echo $fragment, ' ... ';
+                        }
+                        ?>
+                    </div>
+                    <div class="result-link">
+                        <?php echo $r['_source']['path']; ?>
+                    </div>
                 </div>
-                <div class="result-text">
-                    <?php
-                    foreach ($r['highlight']['body'] as $fragment){
-                        echo $fragment, ' ... ';
-                    }
-                    ?>
-                </div>
-                <div class="result-link">
-                    <?php echo $r['_source']['path']; ?>
-                </div>
-            </div>
-            <?php
+                <?php
+            }
         }
-    }
-    ?>
+        ?>
     </div>
 
 
 
+    <div class="pages">
+        <?php
+
+        if(isset($query_res) && $query_res['hits']['total'] >= 1){
+
+            $numPag = floor($query_res['hits']['total'] / 10);
+            if($query_res['hits']['total']%10 > 0)
+                $numPag++;
+            ?>
+            <nav>
+                <ul class="pagination">
+                    <li>
+                        <?php
+                        echo '<li><a href="index.php?q=', $q, '&page=', 1,'"><<</a></li> ';
+
+                        ?>
+                    </li>
+                    <?php
+                    if($_GET['page'] != 1)
+                        echo '<li><a href="index.php?q=', $q, '&page=', $_GET['page']-1,'"><</a></li> ';
+                    ?>
+                    <?php
 
 
-    <div class="pages"></div>
-    <?php
+                    if($_GET['page'] == null || $_GET['page'] < 5)
+                        $middle = 6;
+                    else
+                        $middle = $_GET['page'];
 
-    if(isset($query_res) && $query_res['hits']['total'] >= 1){
+                    for ($i = $middle -5; $i <= min($middle + 4, $numPag); $i++){
+                        if($i == $_GET['page'])
+                            echo '<li class="active"><a href="index.php?q=', $q, '&page=', $i,'">', $i, '</a></li> ';
+                        else
+                            echo '<li><a href="index.php?q=', $q, '&page=', $i,'">', $i, '</a></li> ';
 
-        $numPag = floor($query_res['hits']['total'] / 10);
-        if($query_res['hits']['total']%10 > 0)
-            $numPag++;
-        echo '<ul class="pagination-ul">';
-        echo '<li class="pagination-li" style="float:left"><a class="active">PAGE</a>';
+                    }
+                    ?>
+                    <?php
+                    if($_GET['page'] != $i-1)
+                        echo '<li><a href="index.php?q=', $q, '&page=', $_GET['page']+1,'">></a></li> ';
+                    ?>
+                    <li>
+                        <?php
+                        echo '<li><a href="index.php?q=', $q, '&page=', $numPag,'">>></a></li> ';
 
-        for ($i = 1; $i <= $numPag; $i++){
-            echo '<li class="pagination-li" ><a href="index.php?q=', $q, '&page=', $i,'">', $i, '</a></li> ';
-
+                        ?>
+                    </li>
+                </ul>
+            </nav>
+            <?php
         }
-        echo '</ul>';
-    }
-    ?>
+        ?>
+    </div>
 
 
 
