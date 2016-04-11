@@ -7,28 +7,31 @@ $(document).ready(function () {
 
 
 
-    $('#search').keyup(function() {
+    $('#search').keyup(function(e) {
 
-        $.get('actions/prediction.php', 'q=' + $(this).val(), function(data) {
-
-
-            var opzioni = JSON.parse(data);
+        if(e.keyCode != 38 && e.keyCode != 40) {
+            $.get('actions/prediction.php', 'q=' + $(this).val(), function (data) {
 
 
-            $( "#search" ).autocomplete({
-                source: opzioni,
-                minLength :0,
-                appendTo: '#input-container',
-                select: function(event, ui) {
-                    if(ui.item){
-                        $('#search').val(ui.item.value);
+                var opzioni = JSON.parse(data);
+
+
+                $("#search").autocomplete({
+                    source: opzioni,
+                    minLength: 0,
+                    appendTo: '#input-container',
+                    select: function (event, ui) {
+                        if (ui.item) {
+                            $('#search').val(ui.item.value);
+                        }
+                        $('#search-form').submit();
                     }
-                    $('#search-form').submit();
-                }
-            });
-            $( "#search" ).autocomplete("search", "");
+                });
+                $("#search").autocomplete("search", "");
 
-        });
+
+            });
+        }
     });
 
 });

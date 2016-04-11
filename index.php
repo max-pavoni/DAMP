@@ -101,8 +101,7 @@ if(isset($_GET['q'])){
 
     $people = array();
 
-
-    if(!isset($_GET['page']) || $_GET['page'] > 1) {
+    if(!isset($_GET['page']) || $_GET['page'] == 1) {
         foreach ($output as $r) {
 
             preg_match('/people\/[\s\S]+\//', $r['_source']['path'], $matches);
@@ -117,7 +116,7 @@ if(isset($_GET['q'])){
                 $people[$nome[0]] = $people[$nome[0]] + 1;
 
         }
-        ksort($people);
+        arsort($people);
     }
 }
 
@@ -128,7 +127,10 @@ if(isset($_GET['q'])){
 <html>
 <head>
     <meta charset="utf-8">
-    <title>DAMP</title>
+    <title> DAMP</title>
+    <link rel="icon"
+          type="image/png"
+          href="res/favicon.png">
     <link rel="stylesheet" type="text/css" href="style.css">
     <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
     <!-- Latest compiled and minified CSS -->
@@ -136,6 +138,22 @@ if(isset($_GET['q'])){
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
     <script src="js/prediction.js"></script>
     <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+
+    <style>
+        div.item {
+            vertical-align: top;
+            display: inline-block;
+            text-align: center;
+            width: 120px;
+        }
+        img .avatar {
+            width: 100px;
+            height: 100px;
+        }
+        .caption {
+            display: block;
+        }
+    </style>
 </head>
 <body>
 
@@ -160,17 +178,25 @@ if(isset($_GET['q'])){
             </div>
         </form>
         <?php if(isset($query_res) && $query_res['hits']['total'] >= 1 && ($_GET['page'] == 1 || $_GET['page'] == null && $_GET['q'] != null))  {?>
-            <div class="panel panel-default" style="display: inline-block; float: right; margin: 0px 150px; width: 300px;" >
+            <div class="panel panel-default" style="display: inline-block; float: right; margin: 50px 100px; width: 400px;" >
                 <div class="panel-body">
                     <div>
-                        <p><b>Ricerche correlate:</b></p>
+                        <h4><b>Persone correlate:</b></h4>
                         <hr>
+                        <div>
 
-                        <?php foreach ($people as $person => $value)
-                            echo '<div style="margin-top: 10px;">'. '<a href="index.php?q='. $person .'">'.$person.'</a></div>'
+                        <?php
+                        $i = 0;
+                        foreach ($people as $person => $value) {
+
+                            if($i < 3) {
+                                echo '<div class="item"><a href="index.php?q=' . $person . '"><img class="avatar" style="margin-bottom: 20px;" height="70" width="70" src="res/default-avatar-250x250.png"/></a>' . '<a href="index.php?q=' . $person . '"><span class="caption">' . $person . '</span></a></div>';
+                                $i++;
+                            }
+                        }
                         ?>
                     </div>
-
+                    </div>
                 </div>
             </div>
         <?php }
@@ -190,7 +216,7 @@ if(isset($_GET['q'])){
             echo '<div>', 'Nessun risultato trovato', '</div>';
         }
         if(!empty($query_res['suggest']['didYouMean'][0]['options'][0]['text'])){
-            echo '<div>', 'Forse cercavi: ', '<a href="index.php?q=',trim($query_res['suggest']['didYouMean'][0]['options'][0]['text']) ,'">',$query_res['suggest']['didYouMean'][0]['options'][0]['text'], '</a>', ' ?</div>';
+            echo '<div style="margin-bottom: 20px;"><h3>', 'Forse cercavi: ', '<a href="index.php?q=',trim($query_res['suggest']['didYouMean'][0]['options'][0]['text']) ,'">',$query_res['suggest']['didYouMean'][0]['options'][0]['text'], '</a>', ' ?</h3></div>';
         }
 
     }
@@ -203,7 +229,12 @@ if(isset($_GET['q'])){
                 ?>
                 <div class="result">
                     <div class="result-title">
-                        <a href="http://<?php echo $r['_source']['path']; ?>"><?php echo $r['_source']['title']; ?></a>
+                        <a href="<?php echo $r['_source']['path']; ?>"><?php if(strlen($r['_source']['title']) < 100)
+                            echo $r['_source']['title'];
+                            else
+                            echo substr($r['_source']['title'], 0, 100);
+
+                            ?></a>
                     </div>
                     <div class="result-text">
                         <?php

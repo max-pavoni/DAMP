@@ -89,51 +89,8 @@ body{
     background: #FAFAFA;
     font: 14px/100% Verdana, sans-serif;
 }
-/*
 
 
-
-.active {
-    background-color: #4CAF50;
-    width: 80px;
-    margin-left: -40px;
-}
-
-.pagination-ul {
-    width: 400px;
-    overflow-x: scroll;
-    background: #ccc;
-    white-space: nowrap;
-}
-
-.pagination-li {
-    display: inline-block;
-
-    !* if you need ie7 support *!
-    *display: inline;
-    zoom: 1
-}
-
-li a {
-    display: inline-block;
-    color: black;
-    text-align: center;
-    padding: 14px 16px;
-    text-decoration: none;
-    font-weight: bold;
-}
-!* Change the link color to #111 (black) on hover *!
-li a:hover {
-    background-color: #565;
-}
-
-li {
-    border-right: 1px solid #bbb;
-}
-
-li:last-child {
-    border-right: none;
-}
 
 /*   VOICE   */
 
@@ -145,6 +102,7 @@ li:last-child {
 }
 #info {
     font-size: 12px;
+    margin-bottom: 5px;
     text-align: center;
     color: #777;
     visibility: hidden;
@@ -153,4 +111,8 @@ li:last-child {
     border: 0;
     background-color:transparent;
     padding: 0;
+}
+
+#search {
+    margin-bottom: 5px;
 }
